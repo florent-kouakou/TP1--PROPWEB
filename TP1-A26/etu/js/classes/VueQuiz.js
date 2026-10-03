@@ -6,6 +6,7 @@ import {
     TEMPLATE_BIENVENUE
 } from "../VuesDynamiques.js";
 import {handleDemarrer, handleQuestionSuivante, handleRecommancer} from "../evenements.js";
+import {TEMPLATE_OPTION} from "../../../prof/js/VuesDynamiques";
 
 /**
  * Classe VueQuiz
@@ -74,6 +75,27 @@ export class VueQuiz {
 
     // ---------- Écran de quiz ----------
     #afficheQuiz() {
+
+
+
+
+        // Construction des choix de réponse
+        let htmlOptions = '';
+        for (let i = 0; i < q.options.length; i++) {
+            const option = q.options[i];
+            const classes = this.#determinerClasseAppropriee(i, q, estRepondu, reponseChoisie);
+            htmlOptions += '' + TEMPLATE_OPTION(classes, i, q.lettreA(i), option);
+        }
+
+        // Construction des Badges joueurs
+
+
+
+
+        // Construction du Quiz avec htmlOptions et les Badges des joueurs
+
+
+
 
 
         document.getElementById('nextBtn').addEventListener('click',

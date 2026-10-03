@@ -6,7 +6,7 @@ import {
     TEMPLATE_BIENVENUE
 } from "../VuesDynamiques.js";
 import {handleDemarrer, handleQuestionSuivante, handleRecommancer} from "../evenements.js";
-import {TEMPLATE_OPTION} from "../../../prof/js/VuesDynamiques";
+import {TEMPLATE_OPTION} from "../VuesDynamiques";
 
 /**
  * Classe VueQuiz

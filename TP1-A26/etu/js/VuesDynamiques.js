@@ -25,11 +25,32 @@ export const TEMPLATE_OPTION = (classes, index, lettre, option) => `
     </div>
 `;
 
-// Compléter TEMPLATE_BADGE_JOUEUR
+export const TEMPLATE_BADGE_JOUEUR = (nom, score, estActif) => `
+    <div class="player-badge ${estActif ? 'active' : ''}">
+        <div class="name">${nom}</div>
+        <div class="score">${score}</div>
+        <div class="indicator">${estActif ? '💅 À vous !' : ''}</div>
+    </div>
+`;
 
+export const TEMPLATE_QUIZ = (numero, enonce, htmlOptions, htmlBadges, estRepondu) => `
+    <h1>🧠 Quiz</h1>
+    <p class="subtitle">Tour par tour</p>
 
-// Compléter TEMPLATE_QUIZ
+    <div class="players-status">
+        ${htmlBadges}
+    </div>
 
+    <div class="question-text">( ${numero} ) - ${enonce}</div>
+
+    <div class="options-grid">
+        ${htmlOptions}
+    </div>
+
+    <div class="nav-buttons">
+        <button class="btn btn-next" id="nextBtn" ${estRepondu ? '' : 'disabled'}>Suivant ➡</button>
+    </div>
+`;
 
 export const TEMPLATE_JOUEUR_RESULTAT = (nom, score, estGagnant, htmlIcones = '') => `
     <div class="result-player ${estGagnant ? 'winner' : ''}">

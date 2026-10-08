@@ -3,10 +3,19 @@
 // =============================================================================
 
 import {
-    TEMPLATE_BIENVENUE
+    TEMPLATE_BIENVENUE,
+    TEMPLATE_OPTION,
+    TEMPLATE_BADGE_JOUEUR,
+    TEMPLATE_QUIZ,
+    TEMPLATE_JOUEUR_RESULTAT,
+    TEMPLATE_RESULTAT
 } from "../VuesDynamiques.js";
-import {handleDemarrer, handleQuestionSuivante, handleRecommancer} from "../evenements.js";
-import {TEMPLATE_OPTION} from "../VuesDynamiques";
+import {
+    handleDemarrer,
+    handleChoixDeReponse,
+    handleQuestionSuivante,
+    handleRecommancer
+} from "../evenements.js";
 
 /**
  * Classe VueQuiz
@@ -75,14 +84,15 @@ export class VueQuiz {
 
     // ---------- Écran de quiz ----------
     #afficheQuiz() {
-
-
-
+        const quiz = this.#quiz;
+        const q = quiz.questionActuelle;
+        const estRepondu = quiz.estRepondu;
+        const reponseChoisie = quiz.reponseChoisie;
 
         // Construction des choix de réponse
         let htmlOptions = '';
         for (let i = 0; i < q.options.length; i++) {
-            const option = q.options[i];
+            const option = this.#echapperHtml(q.options[i]);
             const classes = this.#determinerClasseAppropriee(i, q, estRepondu, reponseChoisie);
             htmlOptions += '' + TEMPLATE_OPTION(classes, i, q.lettreA(i), option);
         }
@@ -107,11 +117,44 @@ export class VueQuiz {
 
     // ---------- Écran de résultat ----------
     #afficheResultat() {
+        const quiz = this.#quiz;
+        const gagnant = quiz.gagnant; // null en cas d'égalité
 
+        const message = gagnant
+            ? `🏆 ${this.#echapperHtml(gagnant.nom)} remporte la partie !`
+            : `🤝 Match nul !`;
 
+        const htmlJoueurs = quiz.joueurs
+            .map((joueur) => TEMPLATE_JOUEUR_RESULTAT(
+                this.#echapperHtml(joueur.nom),
+                joueur.score,
+                joueur === gagnant
+            ))
+            .join('');
+
+        this.#conteneur.innerHTML = TEMPLATE_RESULTAT(htmlJoueurs, message);
+
+        document.getElementById('restartBtn').addEventListener('click', (ev) => {
+            handleRecommancer(ev, quiz);
+        });
     }
 
     // ---------- Utilitaires ----------
+    /**
+     * Échappe les caractères HTML pour afficher du texte tel quel
+     * (ex.: l'option "<template>" ne doit pas être interprétée comme une balise).
+     * @param {string} texte
+     * @returns {string}
+     */
+    #echapperHtml(texte) {
+        return String(texte)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
     /**
      * Détermine les classes CSS d'une option en fonction de l'état de la question.
      */

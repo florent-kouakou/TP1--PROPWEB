@@ -114,6 +114,7 @@ export class Quiz {
      */
     demarrer(nomJoueur1, nomJoueur2) {
         this.#joueurs = [new Joueur(nomJoueur1), new Joueur(nomJoueur2)];
+        this.#questionsAVenir = [...this.#questions];
         this.#indexJoueurActuel = 0;
         this.#indexQuestionActuelle = this.#trouveNombreAleatoire(0, this.#questionsAVenir.length - 1)();
         this.#estRepondu = false;
@@ -128,7 +129,25 @@ export class Quiz {
      * @param {number} indexSelectionne
      */
     repondre(indexSelectionne) {
+        // Ignorer si la partie n'est pas en cours ou si on a déjà répondu
+        if (!this.#estDemarre || this.#estTermine || this.#estRepondu) {
+            return;
+        }
+        // Ignorer un index hors limites
+        if (!Number.isInteger(indexSelectionne) ||
+            indexSelectionne < 0 ||
+            indexSelectionne >= this.questionActuelle.options.length) {
+            return;
+        }
 
+        this.#reponsesChoisies[this.#indexQuestionActuelle] = indexSelectionne;
+        this.#estRepondu = true;
+
+        if (this.questionActuelle.estCorrect(indexSelectionne)) {
+            this.joueurActuel.ajouterPoint();
+        }
+
+        this.#rafraichirAffichage();
     }
 
     /**
@@ -136,7 +155,30 @@ export class Quiz {
      * Termine le quiz si on était à la dernière question.
      */
     suivant() {
+        // On ne peut pas avancer tant que la question n'est pas répondue
+        if (!this.#estDemarre || this.#estTermine || !this.#estRepondu) {
+            return;
+        }
 
+        // La question posée ne revient plus pendant la partie
+        this.#questionsAVenir.splice(this.#indexQuestionActuelle, 1);
+
+        const [j1, j2] = this.#joueurs;
+        const ecart = Math.abs(j1.score - j2.score);
+
+        if (ecart >= DIFFERENCE_DE_SCORE_POUR_GAGNER || this.#questionsAVenir.length === 0) {
+            // Un joueur a pris assez d'avance, ou il ne reste plus de questions
+            this.#estTermine = true;
+        } else {
+            // Joueur suivant + nouvelle question tirée au hasard
+            this.#indexJoueurActuel = 1 - this.#indexJoueurActuel;
+            this.#indexQuestionActuelle =
+                this.#trouveNombreAleatoire(0, this.#questionsAVenir.length - 1)();
+            this.#reponsesChoisies[this.#indexQuestionActuelle] = undefined;
+            this.#estRepondu = false;
+        }
+
+        this.#rafraichirAffichage();
     }
 
     /**

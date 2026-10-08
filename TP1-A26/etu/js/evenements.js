@@ -22,7 +22,9 @@ export function handleDemarrer(ev, vue) {
 }
 
 export function handleChoixDeReponse(ev, quiz) {
-// A COMPLÉTER
+    // currentTarget = l'option sur laquelle l'écouteur est attaché
+    const index = Number(ev.currentTarget.dataset.index);
+    quiz.repondre(index);
 }
 
 export function handleQuestionSuivante(ev, quiz) {
